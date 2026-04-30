@@ -4,96 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>갈매고 급식 알리미 🍱</title>
-    <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Nanum+Gothic:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { 
             background: linear-gradient(120deg, #f3fac4 0%, #cdfda1 100%);
-            font-family: 'Gaegu', cursive; min-height: 100vh; padding: 20px 10px;
+            font-family: 'Jua', sans-serif; min-height: 100vh; padding: 10px;
         }
         .meal-card { 
-            max-width: 550px; margin: auto; border-radius: 30px; 
+            max-width: 500px; margin: auto; border-radius: 30px; 
             border: 5px solid white; background-color: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 20px;
         }
+        /* 날짜 레이아웃 최적화 (안 잘리게) */
+        .date-section { display: flex; justify-content: space-between; align-items: center; gap: 5px; }
         .date-picker-input {
-            border: none; background: transparent; font-family: 'Gaegu', cursive;
-            font-size: 1.4rem; font-weight: bold; text-align: center; width: 150px; color: #444;
+            border: none; background: #fff3cd; border-radius: 10px;
+            font-family: 'Jua', sans-serif; font-size: 1.2rem; 
+            text-align: center; width: 145px; color: #444; padding: 2px;
         }
-        .nav-btn { background-color: #ff8e53; color: white; border: none; border-radius: 12px; padding: 5px 10px; }
+        .nav-btn { background-color: #ff8e53; color: white; border: none; border-radius: 10px; padding: 5px 12px; font-size: 1rem; }
         
-        /* 메뉴 레이아웃 개선 */
-        .menu-grid { 
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2열로 배치 */
-            gap: 10px;
-            margin-top: 15px;
-        }
+        /* 여백 줄이기 */
+        .menu-box { background-color: #fff9f0; border-radius: 20px; padding: 15px; margin-top: 10px; border: 2px dashed #ffcc33; }
+        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
         
         .food-item { 
-            background: white;
-            border: 2px solid #fff3cd;
-            border-radius: 15px;
-            padding: 10px 5px;
-            font-size: 1.2rem;
-            color: #333;
-            cursor: pointer;
-            white-space: nowrap;      /* 줄바꿈 방지 */
-            overflow: hidden;         /* 넘치는 글자 숨김 */
-            text-overflow: ellipsis;  /* 말줄임표(...) 표시 */
-            transition: 0.2s;
-            display: block;
-            text-align: center;
+            background: white; border: 2px solid #eee; border-radius: 12px;
+            padding: 8px 5px; font-size: 1.2rem; color: #222; text-align: center;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer;
         }
-        .food-item:hover { 
-            background-color: #ffeaa7; 
-            transform: translateY(-3px);
-            white-space: normal;      /* 호버 시에는 전체 이름 보이기 */
-            overflow: visible;
-            position: relative;
-            z-index: 10;
-        }
+        .food-item:hover { background-color: #82fa92; transform: scale(1.02); }
         
-        .nutrition-details {
-            font-family: sans-serif; font-size: 0.85rem; background: #f1f1f1;
-            border-radius: 10px; padding: 10px; margin-top: 10px; text-align: left; display: none;
-        }
-        .toggle-btn {
-            background: none; border: 1px solid #6c5ce7; color: #6c5ce7;
-            border-radius: 10px; font-size: 0.9rem; padding: 2px 10px; margin-bottom: 5px;
-        }
-        .footer { margin-top: 20px; font-size: 1rem; color: #777; border-top: 1px solid #eee; padding-top: 10px; }
-        .hint { font-size: 0.85rem; color: #ff8e53; }
+        .nutrition-details { font-family: 'Nanum Gothic', sans-serif; font-size: 0.8rem; background: #f1f1f1; border-radius: 10px; padding: 10px; margin-top: 10px; display: none; }
+        .toggle-btn { background: none; border: 2px solid #ff8e53; color: #ff8e53; border-radius: 10px; font-size: 0.85rem; padding: 2px 8px; }
+        
+        /* 이스터 에그 스타일 */
+        .developer { cursor: pointer; color: #ff6b6b; text-decoration: underline; transition: 0.3s; }
+        .developer:hover { color: #ff8e53; transform: scale(1.1); }
+        .footer { margin-top: 15px; font-size: 1rem; color: #777; border-top: 1px solid #eee; padding-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div class="card meal-card p-4">
+        <div class="card meal-card">
             <div class="text-center">
-                <h4 class="text-muted mb-1">🏫 갈매고등학교</h4>
+                <h5 class="text-muted mb-1">🏫 갈매고등학교</h5>
                 <h2 class="fw-bold mb-3">오늘 뭐 나올까?</h2>
 
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="date-section mb-3">
                     <button class="nav-btn" onclick="changeDate(-1)">◀ 어제</button>
                     <input type="date" id="date-input" class="date-picker-input" onchange="updateMeal()">
                     <button class="nav-btn" onclick="changeDate(1)">내일 ▶</button>
                 </div>
 
-                <div class="d-flex justify-content-center gap-2 mb-2">
-                    <span id="kcal-tag" class="badge bg-primary" style="font-size: 0.9rem;">칼로리 정보</span>
+                <div class="d-flex justify-content-center align-items-center gap-2">
+                    <span id="kcal-tag" class="badge" style="background-color: #ff8e53; font-size: 1rem; font-weight: normal;">0 kcal</span>
                     <button class="toggle-btn" onclick="toggleNutrition()">📊 영양 정보</button>
                 </div>
                 
                 <div id="nutrition-box" class="nutrition-details"></div>
 
-                <div class="menu-box p-2">
-                    <div class="hint">💡 누르면 알레르기가 떠요!</div>
-                    <div id="meal-content" class="menu-grid">
-                        </div>
+                <div class="menu-box">
+                    <div id="meal-content" class="menu-grid"></div>
                 </div>
 
-                <div class="footer">👩‍🏫 만든이: 정보 선생님 <b>김효주</b></div>
+                <div class="footer">
+                    👨‍🏫 만든이: 정보 선생님 <span class="developer" onclick="easterEgg()"><b>김효주</b></span>
+                </div>
             </div>
         </div>
     </div>
@@ -103,11 +83,7 @@
         const ATPT_CODE = "J10";
         const SCHUL_CODE = "7531270";
 
-        const allergyMap = {
-            1: "난류", 2: "우유", 3: "메밀", 4: "땅콩", 5: "대두", 6: "밀", 7: "고등어", 8: "게", 
-            9: "새우", 10: "돼지고기", 11: "복숭아", 12: "토마토", 13: "아황산류", 14: "호두", 
-            15: "닭고기", 16: "쇠고기", 17: "오징어", 18: "조개류", 19: "잣"
-        };
+        const allergyMap = { 1: "난류", 2: "우유", 3: "메밀", 4: "땅콩", 5: "대두", 6: "밀", 7: "고등어", 8: "게", 9: "새우", 10: "돼지고기", 11: "복숭아", 12: "토마토", 13: "아황산류", 14: "호두", 15: "닭고기", 16: "쇠고기", 17: "오징어", 18: "조개류", 19: "잣" };
 
         function init() {
             const now = new Date();
@@ -127,17 +103,13 @@
                 if (data.mealServiceDietInfo) {
                     const row = data.mealServiceDietInfo[1].row[0];
                     const menuData = row.DDISH_NM.split("<br/>");
-                    
                     let html = "";
                     menuData.forEach(item => {
                         const name = item.replace(/\([^)]*\)/g, "").trim();
                         const nums = item.match(/\(([^)]+)\)/);
                         const allergyInfo = nums ? nums[1].split('.').map(n => allergyMap[n.trim()]).filter(v => v).join(", ") : "정보 없음";
-                        
-                        // 말줄임표 적용을 위한 구조
-                        html += `<div class="food-item" title="${name}" onclick="alert('📢 [${name}]\\n알레르기 정보: ${allergyInfo}')">${name}</div>`;
+                        html += `<div class="food-item" onclick="alert('📢 [${name}]\\n알레르기: ${allergyInfo}')">${name}</div>`;
                     });
-
                     displayArea.innerHTML = html;
                     document.getElementById('kcal-tag').innerText = `🔥 ${row.CAL_INFO}`;
                     document.getElementById('nutrition-box').innerHTML = row.NTR_INFO.split("<br/>").join("<br>");
@@ -146,7 +118,7 @@
                     document.getElementById('kcal-tag').innerText = "0 kcal";
                 }
             } catch (err) {
-                displayArea.innerHTML = "<div style='grid-column: span 2;'>데이터 로드 실패!</div>";
+                displayArea.innerHTML = "<div style='grid-column: span 2;'>로드 실패!</div>";
             }
         }
 
@@ -160,6 +132,22 @@
         function toggleNutrition() {
             const box = document.getElementById('nutrition-box');
             box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
+        }
+
+        // ✨ 이스터 에그 함수
+        function easterEgg() {
+            // 1. 폭죽 팡팡!
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff8e53', '#ff6b6b', '#82fa92']
+            });
+            
+            // 2. 메시지 띄우기
+            setTimeout(() => {
+                alert("✨ 선생님의 메시지 ✨\n\n\"맛있게 먹고 즐거운 학교생활 하기! 갈매고 화이팅!\" 🧡");
+            }, 500);
         }
 
         init();
