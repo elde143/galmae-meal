@@ -151,11 +151,21 @@
                     const row = data.mealServiceDietInfo[1].row[0];
                     const menuData = row.DDISH_NM.split("<br/>");
                     let html = "";
+
                     menuData.forEach(item => {
-                        const name = item.replace(/\([^)]*\)/g, "").trim();
-                        const nums = item.match(/\(([^)]+)\)/);
-                        const allergyInfo = nums ? nums[1].split('.').map(n => allergyMap[n.trim()]).filter(v => v).join(", ") : "정보 없음";
-                        html += `<div class="food-item" onclick="alert('📢 [${name}]\\n알레르기: ${allergyInfo}')">${name}</div>`;
+                        // 1. 전체 텍스트에서 알레르기 번호 부분만 추출 (맨 뒤의 괄호)
+                        const allMatch = item.match(/\(([\d.]+)\)$/); 
+                        const allergyNums = allMatch ? allMatch[1] : "";
+                        
+                        // 2. 메뉴 이름 정제 (모든 괄호와 별표 제거)
+                        const cleanName = item.replace(/\(([\d.]+)\)$/, "").replace(/\*/g, "").trim();
+                        
+                        // 3. 알레르기 번호를 한글로 변환
+                        const allergyInfo = allergyNums 
+                            ? allergyNums.split('.').map(n => allergyMap[n.trim()]).filter(v => v).join(", ") 
+                            : "정보 없음";
+
+                        html += `<div class="food-item" onclick="alert('📢 [${cleanName}]\\n알레르기: ${allergyInfo}')">${cleanName}</div>`;
                     });
                     displayArea.innerHTML = html;
                     document.getElementById('kcal-tag').innerText = `${row.CAL_INFO}`;
@@ -168,7 +178,6 @@
                 displayArea.innerHTML = "<div style='grid-column: span 2;'>로드 실패 ㅠ</div>";
             }
         }
-
         function changeDate(days) {
             let d = new Date(document.getElementById('date-input').value);
             d.setDate(d.getDate() + days);
