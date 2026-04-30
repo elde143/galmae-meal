@@ -47,15 +47,40 @@
             gap: 8px; margin-top: 10px; 
         }
         
+        /* 음식 아이템 스타일 */
         .food-item { 
-            background: #fffdf5; border: 2px solid #fff3cd; border-radius: 15px;
-            padding: 10px 5px; font-size: 1.15rem; color: #333; text-align: center;
-            /* 길어도 절대 안 잘리게 '한 줄+말줄임표' 유지 */
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+            background: #fffdf5; 
+            border: 2px solid #fff3cd; 
+            border-radius: 15px;
+            padding: 10px 5px; 
+            font-size: 1.15rem; 
+            color: #333; 
+            text-align: center;
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            transition: all 0.2s ease; /* 부드러운 변화 효과 추가 */
+            cursor: pointer;
         }
 
-        .food-item:active { background-color: #82fa92; transform: scale(0.95); }
+        /* PC에서 마우스를 올렸을 때 (Hover) */
+        .food-item:hover { 
+            background-color: #82fa92; /* 상큼한 연두색으로 변경 */
+            border-color: #55efc4;
+            transform: translateY(-3px); /* 살짝 위로 떠오르는 효과 */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            white-space: normal; /* 글자가 길면 전체 다 보여주기 */
+            overflow: visible;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 모바일에서 터치했을 때 (Active) */
+        .food-item:active { 
+            background-color: #55efc4; 
+            transform: scale(0.95); /* 꾹 눌리는 효과 */
+        }
 
         #kcal-tag {
             font-weight: normal !important; 
