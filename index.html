@@ -9,41 +9,61 @@
     <style>
         body { 
             background: linear-gradient(120deg, #a1c4fd 0%, #c2e9fb 100%);
-            font-family: 'Gaegu', cursive;
-            min-height: 100vh;
-            padding: 20px 0;
+            font-family: 'Gaegu', cursive; min-height: 100vh; padding: 20px 10px;
         }
         .meal-card { 
-            max-width: 500px; margin: auto; border-radius: 30px; 
+            max-width: 550px; margin: auto; border-radius: 30px; 
             border: 5px solid white; background-color: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden;
         }
         .date-picker-input {
             border: none; background: transparent; font-family: 'Gaegu', cursive;
-            font-size: 1.4rem; font-weight: bold; text-align: center; width: 160px; color: #444;
+            font-size: 1.4rem; font-weight: bold; text-align: center; width: 150px; color: #444;
         }
-        .nav-btn { background-color: #ff8e53; color: white; border: none; border-radius: 15px; padding: 5px 12px; }
-        .menu-box { 
-            background-color: #fff9f0; border-radius: 20px; padding: 20px;
-            margin: 15px 0; border: 2px dashed #ffcc33;
+        .nav-btn { background-color: #ff8e53; color: white; border: none; border-radius: 12px; padding: 5px 10px; }
+        
+        /* 메뉴 레이아웃 개선 */
+        .menu-grid { 
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2열로 배치 */
+            gap: 10px;
+            margin-top: 15px;
         }
-        /* 음식 버튼 스타일 */
+        
         .food-item { 
-            display: block; font-size: 1.6rem; line-height: 1.8; color: #333;
-            cursor: pointer; transition: 0.2s; border-radius: 10px;
+            background: white;
+            border: 2px solid #fff3cd;
+            border-radius: 15px;
+            padding: 10px 5px;
+            font-size: 1.2rem;
+            color: #333;
+            cursor: pointer;
+            white-space: nowrap;      /* 줄바꿈 방지 */
+            overflow: hidden;         /* 넘치는 글자 숨김 */
+            text-overflow: ellipsis;  /* 말줄임표(...) 표시 */
+            transition: 0.2s;
+            display: block;
+            text-align: center;
         }
-        .food-item:hover { background-color: #ffeaa7; transform: scale(1.05); }
+        .food-item:hover { 
+            background-color: #ffeaa7; 
+            transform: translateY(-3px);
+            white-space: normal;      /* 호버 시에는 전체 이름 보이기 */
+            overflow: visible;
+            position: relative;
+            z-index: 10;
+        }
         
         .nutrition-details {
-            font-family: sans-serif; font-size: 0.9rem; background: #eee;
+            font-family: sans-serif; font-size: 0.85rem; background: #f1f1f1;
             border-radius: 10px; padding: 10px; margin-top: 10px; text-align: left; display: none;
         }
         .toggle-btn {
             background: none; border: 1px solid #6c5ce7; color: #6c5ce7;
-            border-radius: 10px; font-size: 0.9rem; padding: 2px 10px; margin-bottom: 10px;
+            border-radius: 10px; font-size: 0.9rem; padding: 2px 10px; margin-bottom: 5px;
         }
-        .footer { margin-top: 20px; font-size: 1rem; color: #777; }
-        .hint { font-size: 0.9rem; color: #ff8e53; margin-bottom: 5px; }
+        .footer { margin-top: 20px; font-size: 1rem; color: #777; border-top: 1px solid #eee; padding-top: 10px; }
+        .hint { font-size: 0.85rem; color: #ff8e53; }
     </style>
 </head>
 <body>
@@ -52,7 +72,7 @@
         <div class="card meal-card p-4">
             <div class="text-center">
                 <h4 class="text-muted mb-1">🏫 갈매고등학교</h4>
-                <h2 class="fw-bold mb-4">오늘의 메뉴는?</h2>
+                <h2 class="fw-bold mb-3">오늘 뭐 나올까?</h2>
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <button class="nav-btn" onclick="changeDate(-1)">◀ 어제</button>
@@ -60,14 +80,17 @@
                     <button class="nav-btn" onclick="changeDate(1)">내일 ▶</button>
                 </div>
 
-                <div id="kcal-tag" class="badge bg-primary mb-2" style="font-size: 1rem;">칼로리 정보</div>
-                <br>
-                <button class="toggle-btn" onclick="toggleNutrition()">📊 영양성분 보기/닫기</button>
+                <div class="d-flex justify-content-center gap-2 mb-2">
+                    <span id="kcal-tag" class="badge bg-primary" style="font-size: 0.9rem;">칼로리 정보</span>
+                    <button class="toggle-btn" onclick="toggleNutrition()">📊 영양 정보</button>
+                </div>
+                
                 <div id="nutrition-box" class="nutrition-details"></div>
 
-                <div class="menu-box">
-                    <div class="hint">💡 음식을 누르면 알레르기 정보가 보여요!</div>
-                    <div id="meal-content">정보 로딩 중...</div>
+                <div class="menu-box p-2">
+                    <div class="hint">💡 길면 말줄임표(...)로 보여요. 누르면 전체 이름과 알레르기가 떠요!</div>
+                    <div id="meal-content" class="menu-grid">
+                        </div>
                 </div>
 
                 <div class="footer">👨‍🏫 만든이: 정보 선생님 <b>김효주</b></div>
@@ -94,7 +117,8 @@
 
         async function updateMeal() {
             const dateVal = document.getElementById('date-input').value.replace(/-/g, "");
-            document.getElementById('meal-content').innerHTML = "로딩 중... 🔃";
+            const displayArea = document.getElementById('meal-content');
+            displayArea.innerHTML = "<div style='grid-column: span 2;'>로딩 중... 🔃</div>";
             
             try {
                 const res = await fetch(`https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${API_KEY}&Type=json&ATPT_OFCDC_SC_CODE=${ATPT_CODE}&SD_SCHUL_CODE=${SCHUL_CODE}&MLSV_YMD=${dateVal}`);
@@ -106,22 +130,23 @@
                     
                     let html = "";
                     menuData.forEach(item => {
-                        // 음식명과 알레르기 번호 분리
                         const name = item.replace(/\([^)]*\)/g, "").trim();
                         const nums = item.match(/\(([^)]+)\)/);
-                        const allergyInfo = nums ? nums[1].split('.').map(n => allergyMap[n.trim()]).filter(v => v).join(", ") : "알레르기 정보 없음";
+                        const allergyInfo = nums ? nums[1].split('.').map(n => allergyMap[n.trim()]).filter(v => v).join(", ") : "정보 없음";
                         
-                        html += `<span class="food-item" onclick="alert('📢 [${name}] 알레르기 정보: ${allergyInfo}')">${name}</span>`;
+                        // 말줄임표 적용을 위한 구조
+                        html += `<div class="food-item" title="${name}" onclick="alert('📢 [${name}]\\n알레르기 정보: ${allergyInfo}')">${name}</div>`;
                     });
 
-                    document.getElementById('meal-content').innerHTML = html;
+                    displayArea.innerHTML = html;
                     document.getElementById('kcal-tag').innerText = `🔥 ${row.CAL_INFO}`;
                     document.getElementById('nutrition-box').innerHTML = row.NTR_INFO.split("<br/>").join("<br>");
                 } else {
-                    document.getElementById('meal-content').innerHTML = "급식 정보가 없습니다. 🏖️";
+                    displayArea.innerHTML = "<div style='grid-column: span 2;'>급식 정보가 없습니다. 🏖️</div>";
+                    document.getElementById('kcal-tag').innerText = "0 kcal";
                 }
             } catch (err) {
-                document.getElementById('meal-content').innerText = "데이터 로드 실패!";
+                displayArea.innerHTML = "<div style='grid-column: span 2;'>데이터 로드 실패!</div>";
             }
         }
 
@@ -134,7 +159,7 @@
 
         function toggleNutrition() {
             const box = document.getElementById('nutrition-box');
-            box.style.display = (box.style.display === "none") ? "block" : "none";
+            box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
         }
 
         init();
