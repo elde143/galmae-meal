@@ -13,82 +13,37 @@
             min-height: 100vh;
             padding: 20px 0;
         }
-
         .meal-card { 
-            max-width: 500px; 
-            margin: auto;
-            border-radius: 30px; 
-            border: 5px solid white;
-            background-color: rgba(255, 255, 255, 0.95);
+            max-width: 500px; margin: auto; border-radius: 30px; 
+            border: 5px solid white; background-color: rgba(255, 255, 255, 0.95);
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
-
-        /* 날짜 선택 스타일 */
         .date-picker-input {
-            border: none;
-            background: transparent;
-            font-family: 'Gaegu', cursive;
-            font-size: 1.4rem;
-            font-weight: bold;
-            text-align: center;
-            width: 160px;
-            cursor: pointer;
-            color: #444;
+            border: none; background: transparent; font-family: 'Gaegu', cursive;
+            font-size: 1.4rem; font-weight: bold; text-align: center; width: 160px; color: #444;
         }
-
-        .nav-btn {
-            background-color: #ff8e53;
-            color: white;
-            border: none;
-            border-radius: 15px;
-            padding: 5px 12px;
-            font-size: 1.1rem;
-        }
-
+        .nav-btn { background-color: #ff8e53; color: white; border: none; border-radius: 15px; padding: 5px 12px; }
         .menu-box { 
-            background-color: #fff9f0; 
-            border-radius: 20px; 
-            padding: 20px;
-            margin: 15px 0;
-            border: 2px dashed #ffcc33;
+            background-color: #fff9f0; border-radius: 20px; padding: 20px;
+            margin: 15px 0; border: 2px dashed #ffcc33;
         }
-
-        .menu-item { font-size: 1.4rem; line-height: 1.6; color: #333; }
+        /* 음식 버튼 스타일 */
+        .food-item { 
+            display: block; font-size: 1.6rem; line-height: 1.8; color: #333;
+            cursor: pointer; transition: 0.2s; border-radius: 10px;
+        }
+        .food-item:hover { background-color: #ffeaa7; transform: scale(1.05); }
         
-        /* 영양성분 아코디언 스타일 */
         .nutrition-details {
-            font-family: sans-serif;
-            font-size: 0.9rem;
-            background: #eee;
-            border-radius: 10px;
-            padding: 10px;
-            margin-top: 10px;
-            text-align: left;
-            display: none; /* 기본은 숨김 */
+            font-family: sans-serif; font-size: 0.9rem; background: #eee;
+            border-radius: 10px; padding: 10px; margin-top: 10px; text-align: left; display: none;
         }
-
         .toggle-btn {
-            background: none;
-            border: 1px solid #6c5ce7;
-            color: #6c5ce7;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            padding: 2px 10px;
-            margin-bottom: 10px;
+            background: none; border: 1px solid #6c5ce7; color: #6c5ce7;
+            border-radius: 10px; font-size: 0.9rem; padding: 2px 10px; margin-bottom: 10px;
         }
-
-        .footer {
-            margin-top: 20px;
-            font-size: 1rem;
-            color: #777;
-        }
-
-        .allergy-guide {
-            font-size: 0.75rem;
-            color: #aaa;
-            font-family: sans-serif;
-            margin-top: 15px;
-        }
+        .footer { margin-top: 20px; font-size: 1rem; color: #777; }
+        .hint { font-size: 0.9rem; color: #ff8e53; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -101,74 +56,69 @@
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <button class="nav-btn" onclick="changeDate(-1)">◀ 어제</button>
-                    <input type="date" id="date-input" class="date-picker-input" onchange="setDate(this.value)">
+                    <input type="date" id="date-input" class="date-picker-input" onchange="updateMeal()">
                     <button class="nav-btn" onclick="changeDate(1)">내일 ▶</button>
                 </div>
 
                 <div id="kcal-tag" class="badge bg-primary mb-2" style="font-size: 1rem;">칼로리 정보</div>
                 <br>
                 <button class="toggle-btn" onclick="toggleNutrition()">📊 영양성분 보기/닫기</button>
-                
-                <div id="nutrition-box" class="nutrition-details">
-                    </div>
+                <div id="nutrition-box" class="nutrition-details"></div>
 
                 <div class="menu-box">
-                    <div id="meal-content" class="menu-item">정보 로딩 중...</div>
+                    <div class="hint">💡 음식을 누르면 알레르기 정보가 보여요!</div>
+                    <div id="meal-content">정보 로딩 중...</div>
                 </div>
 
-                <div class="allergy-guide">
-                    <strong>알레르기:</strong> 1.난류 2.우유 3.메밀 4.땅콩 5.대두 6.밀 7.고등어 8.게 9.새우 10.돼지고기 11.복숭아 12.토마토 13.아황산류 14.호두 15.닭고기 16.쇠고기 17.오징어 18.조개류 19.잣
-                </div>
-
-                <div class="footer">
-                    👨‍🏫 만든이: 정보 선생님 <b>김효주</b>
-                </div>
+                <div class="footer">👨‍🏫 만든이: 정보 선생님 <b>김효주</b></div>
             </div>
         </div>
     </div>
 
     <script>
-        const API_KEY = "94dd3b88730f49469b6245d9c213b99c"; // 발급받은 키 입력
+        const API_KEY = "94dd3b88730f49469b6245d9c213b99c"; 
         const ATPT_CODE = "J10";
         const SCHUL_CODE = "7531270";
 
-        let currentDt = new Date();
+        const allergyMap = {
+            1: "난류", 2: "우유", 3: "메밀", 4: "땅콩", 5: "대두", 6: "밀", 7: "고등어", 8: "게", 
+            9: "새우", 10: "돼지고기", 11: "복숭아", 12: "토마토", 13: "아황산류", 14: "호두", 
+            15: "닭고기", 16: "쇠고기", 17: "오징어", 18: "조개류", 19: "잣"
+        };
 
-        // 초기 날짜 설정
         function init() {
-            const yyyy = currentDt.getFullYear();
-            const mm = String(currentDt.getMonth() + 1).padStart(2, '0');
-            const dd = String(currentDt.getDate()).padStart(2, '0');
-            document.getElementById('date-input').value = `${yyyy}-${mm}-${dd}`;
+            const now = new Date();
+            document.getElementById('date-input').value = now.toISOString().split('T')[0];
             updateMeal();
         }
 
         async function updateMeal() {
-            const dateVal = document.getElementById('date-input').value;
-            const yyyymmdd = dateVal.replace(/-/g, "");
-            
+            const dateVal = document.getElementById('date-input').value.replace(/-/g, "");
             document.getElementById('meal-content').innerHTML = "로딩 중... 🔃";
-            document.getElementById('nutrition-box').style.display = "none";
-
-            const url = `https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${API_KEY}&Type=json&ATPT_OFCDC_SC_CODE=${ATPT_CODE}&SD_SCHUL_CODE=${SCHUL_CODE}&MLSV_YMD=${yyyymmdd}`;
-
+            
             try {
-                const res = await fetch(url);
+                const res = await fetch(`https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=${API_KEY}&Type=json&ATPT_OFCDC_SC_CODE=${ATPT_CODE}&SD_SCHUL_CODE=${SCHUL_CODE}&MLSV_YMD=${dateVal}`);
                 const data = await res.json();
 
                 if (data.mealServiceDietInfo) {
                     const row = data.mealServiceDietInfo[1].row[0];
-                    // 메뉴 정제
-                    let menu = row.DDISH_NM.replace(/\([^)]*\)/g, "").split("<br/>").join("<br>");
-                    document.getElementById('meal-content').innerHTML = menu;
+                    const menuData = row.DDISH_NM.split("<br/>");
                     
-                    // 칼로리 및 영양성분
+                    let html = "";
+                    menuData.forEach(item => {
+                        // 음식명과 알레르기 번호 분리
+                        const name = item.replace(/\([^)]*\)/g, "").trim();
+                        const nums = item.match(/\(([^)]+)\)/);
+                        const allergyInfo = nums ? nums[1].split('.').map(n => allergyMap[n.trim()]).filter(v => v).join(", ") : "알레르기 정보 없음";
+                        
+                        html += `<span class="food-item" onclick="alert('📢 [${name}] 알레르기 정보: ${allergyInfo}')">${name}</span>`;
+                    });
+
+                    document.getElementById('meal-content').innerHTML = html;
                     document.getElementById('kcal-tag').innerText = `🔥 ${row.CAL_INFO}`;
                     document.getElementById('nutrition-box').innerHTML = row.NTR_INFO.split("<br/>").join("<br>");
                 } else {
                     document.getElementById('meal-content').innerHTML = "급식 정보가 없습니다. 🏖️";
-                    document.getElementById('kcal-tag').innerText = "정보 없음";
-                    document.getElementById('nutrition-box').innerHTML = "영양 정보가 없습니다.";
                 }
             } catch (err) {
                 document.getElementById('meal-content').innerText = "데이터 로드 실패!";
@@ -176,22 +126,15 @@
         }
 
         function changeDate(days) {
-            let date = new Date(document.getElementById('date-input').value);
-            date.setDate(date.getDate() + days);
-            const y = date.getFullYear();
-            const m = String(date.getMonth() + 1).padStart(2, '0');
-            const d = String(date.getDate()).padStart(2, '0');
-            document.getElementById('date-input').value = `${y}-${m}-${d}`;
-            updateMeal();
-        }
-
-        function setDate(val) {
+            let d = new Date(document.getElementById('date-input').value);
+            d.setDate(d.getDate() + days);
+            document.getElementById('date-input').value = d.toISOString().split('T')[0];
             updateMeal();
         }
 
         function toggleNutrition() {
             const box = document.getElementById('nutrition-box');
-            box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
+            box.style.display = (box.style.display === "none") ? "block" : "none";
         }
 
         init();
